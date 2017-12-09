@@ -15,3 +15,14 @@
  1. Można dodać/zmienić sposób przyrządzenia
  1. Można wrócić do lsity przepisów
  
+## Model
+
+### Przepis
+```
+{
+  "name": string|required,
+  "description": string|optional,
+  "ingredients": string|otpional,
+  "howToPrepare": string|optional
+}
+```
