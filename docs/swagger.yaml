@@ -67,6 +67,8 @@ paths:
           schema:
             $ref: '#/definitions/Recipe'
       responses:
+        '204':
+          description: Success
         '400':
           description: Invalid body format
         '404':
