@@ -5,16 +5,16 @@ info:
   title: CookHub
 basePath: /rest/v1
 tags:
-  - name: receipe
-    description: Manage receipes
+  - name: recipe
+    description: Manage recipes
 schemes:
   - http
 paths:
-  /receipes:
+  /recipes:
     post:
-      summary: Create new receipe
+      summary: Create new recipe
       tags:
-        - receipe
+        - recipe
       consumes:
         - application/json
       produces:
@@ -22,33 +22,33 @@ paths:
       parameters:
         - in: body
           name: body
-          description: Receipe definition
+          description: Recipe definition
           required: true
           schema:
-            $ref: '#/definitions/Receipe'
+            $ref: '#/definitions/Recipe'
       responses:
         '200':
           description: Successfuly created
           schema:
-            $ref: '#/definitions/CreateReceipeResponse'
+            $ref: '#/definitions/CreateRecipeResponse'
         '400':
           description: Invalid body format
     get:
-      summary: List all receipes
+      summary: List all recipes
       tags:
-        - receipe
+        - recipe
       produces:
         - application/json
       responses:
         '200':
           description: Successfuly created
           schema:
-            $ref: '#/definitions/ListOfReceipes'
-  '/receipes/{id}':
+            $ref: '#/definitions/ListOfRecipes'
+  '/recipes/{id}':
     put:
       tags:
-        - receipe
-      summary: Update an existing receipe
+        - recipe
+      summary: Update an existing recipe
       consumes:
         - application/json
       produces:
@@ -59,32 +59,32 @@ paths:
           required: true
           type: integer
           minimum: 1
-          description: The receipe ID.
+          description: The recipe ID.
         - in: body
           name: body
-          description: New receipe definition
+          description: New recipe definition
           required: true
           schema:
-            $ref: '#/definitions/Receipe'
+            $ref: '#/definitions/Recipe'
       responses:
         '400':
           description: Invalid body format
         '404':
-          description: Receipe not found
+          description: Recipe not found
     get:
-      summary: Get receipe details
+      summary: Get recipe details
       tags:
-        - receipe
+        - recipe
       produces:
         - application/json
       responses:
         '200':
           schema:
-            $ref: '#/definitions/Receipe'
+            $ref: '#/definitions/Recipe'
         '404':
-          description: Receipe not found
+          description: Recipe not found
 definitions:
-  Receipe:
+  Recipe:
     type: object
     required:
       - name
@@ -101,7 +101,7 @@ definitions:
       preparation:
         type: string
         example: soak cabbage in salted water
-  ReceipeSummary:
+  RecipeSummary:
     type: object
     required:
       - name
@@ -113,7 +113,7 @@ definitions:
       id:
         type: integer
         example: 123456
-  CreateReceipeResponse:
+  CreateRecipeResponse:
     type: object
     required:
       - id
@@ -121,8 +121,8 @@ definitions:
       id:
         type: integer
         example: 123456
-  ListOfReceipes:
+  ListOfRecipes:
     type: array
     items:
       allOf:
-        - $ref: '#/definitions/ReceipeSummary'
+        - $ref: '#/definitions/RecipeSummary'
