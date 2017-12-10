@@ -1,0 +1,575 @@
+swagger: '2.0'
+info:
+ description: |-
+
+
+        This document describes AirSync REST
+
+
+        Notes:
+
+
+        * ASDID (AirSync Device Identifier) format is [A-F0-9]{24}
+
+
+        API methods take parameters of three types:
+
+
+        *path - parameter supplied in the resource path part of URL
+
+
+        *query - parameter supplied in the query part of URL
+
+
+        *body - parameter supplied in the body of request
+
+
+        Each REST resource path has prefix of /rest/${version}/. Currently it is 1.9.
+
+
+            It should be always equal to API version that service implements.
+
+
+
+
+
+
+ title: AirSync REST API
+ version: '1.9 '
+tags:
+ - name: alarms
+   description: 'This section describes interface for device alarms retrieval.'
+ - name: logs
+   description: 'Interaction with system logs - Event HistoryThis section describes API to extract Event History logs from system.'
+ - name: flexible_entities
+   description: 'This section describes interface for Flexible Entities.'
+schemes:
+ - http
+ - https
+paths:
+ /extension/devices/{did}/alarms:
+  get:
+   tags:
+    - alarms
+   summary: 'Get alarms for device identified by DID'
+   parameters:
+    - name: did
+      in: path
+      description: 'DID of a device'
+      required: true
+      type: string
+   responses:
+    '200':
+      description: Device alarms
+      schema:
+       $ref: '#/definitions/Alarms'
+    '404':
+      description: Not Found
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+  patch:
+   tags:
+    - alarms
+   summary: 'Set alarms for device identified by DID'
+   parameters:
+    - name: did
+      in: path
+      description: 'DID of a device'
+      required: true
+      type: string
+    - name: alarms_data
+      in: body
+      description: 'List of alarms'
+      schema:
+       $ref: '#/definitions/JSONObjectAlarms'
+   responses:
+    '200':
+      description: Device alarms
+      schema:
+       $ref: '#/definitions/Alarms'
+    '404':
+      description: Not Found
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+ /extension/devices/{did}/commands:
+  post:
+   tags:
+    - commands
+   summary: 'Execute command for device identified by DID'
+   parameters:
+    - name: did
+      in: path
+      description: 'DID of a device'
+      required: true
+      type: string
+    - name: command_data
+      in: body
+      description: 'Command data'
+      schema:
+       $ref: '#/definitions/JSONObjectCommand'
+   responses:
+    '201':
+      description: Command scheduled to be executed
+      schema:
+       $ref: '#/definitions/JSONObjectCommandId'
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '404':
+      description: Not Found
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '409':
+      description: Conflict - command with given ID has already been scheduled to be executed
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+ /extension/devices/{did}/commands/{command_id}:
+  get:
+   tags:
+    - commands
+   summary: 'Get command details for device identified by DID'
+   parameters:
+    - name: did
+      in: path
+      description: 'DID of a device'
+      required: true
+      type: string
+    - name: command_id
+      in: path
+      description: 'Command Identifier'
+      required: true
+      type: string
+   responses:
+    '200':
+      description: Command details
+      schema:
+       $ref: '#/definitions/JSONObjectCommandDetails'
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '404':
+      description: Not Found
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+  delete:
+   tags:
+    - commands
+   summary: 'Clear command for device identified by DID'
+   parameters:
+    - name: did
+      in: path
+      description: 'DID of a device'
+      required: true
+      type: string
+    - name: command_id
+      in: path
+      description: 'Command Identifier'
+      required: true
+      type: string
+   responses:
+    '204':
+      description: Command cleared
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '404':
+      description: Not Found
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+ /extension/events/{device_id}:
+  post:
+   tags:
+    - logs
+   summary: 'Add events to history.'
+   parameters:
+    - name: device_id
+      in: path
+      description: 'Device Id for which events should be added'
+      required: true
+      type: string
+    - name: events_data
+      in: body
+      description: 'List of events'
+      schema:
+       $ref: '#/definitions/EventsDataObject'
+   responses:
+    '201':
+      description: Events added
+      schema:
+       $ref: '#/definitions/EventIDs'
+    '404':
+      description: Device not found
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+ /extension/devices/{device_id}/entities:
+  get:
+   tags:
+    - flexible_entities
+   summary: 'Get entity. Provide topic to narrow returned data.'
+   parameters:
+    - name: device_id
+      in: path
+      description: 'Id of the device'
+      required: true
+      type: string
+    - name: topic
+      in: query
+      description: 'JSON Pointer to subsection of the document which should be returned'
+      type: string
+   responses:
+    '200':
+      description: OK
+      schema:
+       $ref: '#/definitions/JSONObject'
+    '404':
+      description: Not Found
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+  put:
+   tags:
+    - flexible_entities
+   summary: 'Set entity data at given topic.'
+   parameters:
+    - name: device_id
+      in: path
+      description: 'Id of the device'
+      required: true
+      type: string
+    - name: topic
+      in: query
+      description: 'JSON Pointer to subsection of the document which should be added / replaced'
+      type: string
+    - name: data
+      in: body
+      description: 'Data to set for given device (and topic)'
+      required: true
+      schema:
+       $ref: '#/definitions/JSONObject'
+   responses:
+    '204':
+      description: No Content
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+  delete:
+   tags:
+    - flexible_entities
+   summary: 'Delete entity.'
+   parameters:
+    - name: device_id
+      in: path
+      description: 'Id of the device'
+      required: true
+      type: string
+    - name: topic
+      in: query
+      description: 'JSON Pointer to subsection of the document which should be removed'
+      type: string
+   responses:
+    '204':
+      description: No Content
+    '404':
+      description: Not Found
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+  patch:
+   tags:
+    - flexible_entities
+   summary: 'Patch entity data at given topic.'
+   parameters:
+    - name: device_id
+      in: path
+      description: 'Id of the device'
+      required: true
+      type: string
+    - name: topic
+      in: query
+      description: 'JSON Pointer to subsection of the document which should be modified'
+      type: string
+    - name: patch
+      in: body
+      description: 'JSONPatch as in RFC 6902.'
+      required: true
+      schema:
+       $ref: '#/definitions/JSONObject'
+   responses:
+    '204':
+      description: No Content
+    '400':
+      description: Bad Request - request malformed e.g. JSON body is invalid or is missing some fields
+    '401':
+      description: Unauthorized - request couldn't be properly authenticated
+    '403':
+      description: Forbidden - user tried to access a resource and failed to authorize
+    '405':
+      description: Method not allowed to that URI
+    '406':
+      description: Not Acceptable - only JSON format is accepted
+    '500':
+      description: Internal Server Error
+    '503':
+      description: Service Unavailable - backend service couldn't handle the request
+    '504':
+      description: Gateway Timeout - request couldn't be handled by the backend service
+definitions:
+ binary:
+  type: string
+ JSONObject:
+  type: object
+  description: 'JSON object'
+ JSONPointer:
+  type: string
+  description: 'JSONPointer as in RFC 6901.'
+ DID:
+  type: string
+  description: 'Device Identifier.'
+ IsoDateTime:
+  type: string
+  description: 'Date represented by ISO 8601 standard'
+ Timestamp:
+  type: integer
+  description: 'Integer in range [0, 2^63-1]. Timestamp in milliseconds since epoch(1st Jan 1970).'
+ AlarmId:
+  type: string
+  description: 'Alarm identifier.'
+ TimeStampObject:
+  type: string
+  description: 'Timestamp can be one of two formats: IsoDateTime or Timestamp'
+ JSONObjectAlarms:
+  type: object
+  description: 'Request alarms JSON object'
+  properties :
+   data:
+    $ref: '#/definitions/AlarmsPatch'
+    description: 'Data array containing AlarmPatch objects'
+ EventsDataObject:
+  type: object
+  description: ''
+  properties :
+   data:
+    $ref: '#/definitions/EventList'
+    description: ''
+ EventIDs:
+  type: object
+  description: 'Identifiers of generated events.'
+  properties :
+   event_ids:
+    $ref: '#/definitions/IDs'
+    description: ''
+ Alarm:
+  type: object
+  description: 'Alarm description.'
+  properties :
+   alarm_id:
+    $ref: '#/definitions/AlarmId'
+    description: 'Alarm"s identifier.'
+   alarm_state:
+    type: string
+    description: 'Alarm"s state. SET or CLEARED.'
+   set_ts:
+    $ref: '#/definitions/Timestamp'
+    description: 'Alarm"s set timestamp.'
+   clear_ts:
+    $ref: '#/definitions/Timestamp'
+    description: 'Alarm"s clear timestamp.'
+   severity:
+    type: string
+    description: 'Alarm"s severity. Allowed values: EMERGENCY,FATAL,CRITICAL,MAJOR,ERROR,MINOR,WARNING,INFORMATIONAL.'
+   description:
+    type: string
+    description: 'Alarm"s text.'
+   optional:
+    $ref: '#/definitions/JSONObject'
+    description: 'Contains custom valid JSON object. Can be used to store additional information regarding to alarm.'
+ AlarmPatch:
+  type: object
+  description: 'Alarm"s identifier.'
+  properties :
+   alarm_id:
+    $ref: '#/definitions/AlarmId'
+    description: 'Alarm"s identifier.'
+   action:
+    type: string
+    description: 'Alarm"s action to set its state. Allowed value: SET or CLEAR.'
+   timestamp:
+    $ref: '#/definitions/TimeStampObject'
+    description: 'Alarm"s timestamp.If action is SET timestamp is added to set_ts field.If action is CLEAR timestamp is added to clear_ts'
+   severity:
+    type: string
+    description: 'Alarm"s severity. Allowed values: EMERGENCY,FATAL,CRITICAL,MAJOR,ERROR,MINOR,WARNING,INFORMATIONAL.'
+   description:
+    type: string
+    description: 'Alarm"s optional description.'
+   optional:
+    $ref: '#/definitions/JSONObject'
+    description: 'Contains custom valid JSON object. Can be used to store additional information regarding to alarm.'
+ Event:
+  type: object
+  description: 'Custom event data'
+  properties :
+   type:
+    type: string
+    description: 'Type of event'
+   timestamp:
+    $ref: '#/definitions/TimeStampObject'
+    description: 'Event occurence timestamp'
+   alarm_severity:
+    type: string
+    description: 'Severity of event. Allowed values: EMERGENCY,FATAL,CRITICAL,MAJOR,ERROR,MINOR,WARNING,INFORMATIONAL.'
+   details_json:
+    $ref: '#/definitions/JSONObject'
+    description: 'Event"s custom data'
+ Alarms:
+  type: array
+  items:
+   $ref: '#/definitions/Alarm'
+ IDs:
+  type: array
+  items:
+   type: string
+   description: 'Array of string identifiers.'
+ AlarmsPatch:
+  type: array
+  items:
+   $ref: '#/definitions/AlarmPatch'
+ EventList:
+  type: array
+  items:
+   $ref: '#/definitions/Event'
+ CommandId:
+  type: string
+  description: 'Command identifier'
+  example: '178359'
+ CommandStatus:
+  type: string
+  description: 'Command status'
+  enum: [PENDING, IN_PROGRESS, DELIVERED, FAILED]
+  example: 'DELIVERED'
+ JSONObjectCommandId:
+  type: object
+  description: 'Response JSON object with command identifier'
+  properties :
+   id:
+    $ref: '#/definitions/CommandId'
+ JSONObjectCommand:
+  type: object
+  description: 'Request JSON object with command data'
+  properties :
+   id:
+    $ref: '#/definitions/CommandId'
+   data:
+    type: string
+    description: Command data encoded as base64 string
+    example: 'Rmc2Qgc2RzZA=='
+ JSONObjectCommandDetails:
+  type: object
+  description: 'Response JSON object with command details'
+  properties :
+   id:
+    $ref: '#/definitions/CommandId'
+   data:
+    type: string
+    description: Command data encoded as base64 string
+    example: 'Rmc2Qgc2RzZA=='
+   status:
+    $ref: '#/definitions/CommandStatus'
