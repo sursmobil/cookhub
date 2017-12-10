@@ -1,0 +1,128 @@
+swagger: '2.0'
+info:
+  description: This is a description of CookHub server REST API.
+  version: 1.0.0
+  title: CookHub
+basePath: /rest/v1
+tags:
+  - name: receipe
+    description: Manage receipes
+schemes:
+  - http
+paths:
+  /receipes:
+    post:
+      summary: Create new receipe
+      tags:
+        - receipe
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Receipe definition
+          required: true
+          schema:
+            $ref: '#/definitions/Receipe'
+      responses:
+        '200':
+          description: Successfuly created
+          schema:
+            $ref: '#/definitions/CreateReceipeResponse'
+        '400':
+          description: Invalid body format
+    get:
+      summary: List all receipes
+      tags:
+        - receipe
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successfuly created
+          schema:
+            $ref: '#/definitions/ListOfReceipes'
+  '/receipes/{id}':
+    put:
+      tags:
+        - receipe
+      summary: Update an existing receipe
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          minimum: 1
+          description: The receipe ID.
+        - in: body
+          name: body
+          description: New receipe definition
+          required: true
+          schema:
+            $ref: '#/definitions/Receipe'
+      responses:
+        '400':
+          description: Invalid body format
+        '404':
+          description: Receipe not found
+    get:
+      summary: Get receipe details
+      tags:
+        - receipe
+      produces:
+        - application/json
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Receipe'
+        '404':
+          description: Receipe not found
+definitions:
+  Receipe:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: Kim Chi
+      description:
+        type: string
+        example: Delicious korean Sauerkraut
+      ingredients:
+        type: string
+        example: 'cabbage, chili, ginger, salt, water'
+      preparation:
+        type: string
+        example: soak cabbage in salted water
+  ReceipeSummary:
+    type: object
+    required:
+      - name
+      - id
+    properties:
+      name:
+        type: string
+        example: Kim Chi
+      id:
+        type: integer
+        example: 123456
+  CreateReceipeResponse:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: integer
+        example: 123456
+  ListOfReceipes:
+    type: array
+    items:
+      allOf:
+        - $ref: '#/definitions/ReceipeSummary'
